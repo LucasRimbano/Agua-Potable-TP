@@ -3,22 +3,13 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 
-def analizar_y_normalizar_datos(
-    ruta_csv,
-    carpeta_salida="analisis_normalizacion",
-    columna_objetivo="Potability"
-):
-    
-    df = pd.read_csv(ruta_csv)
-
- 
+def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion", columna_objetivo="Potability"):
+    df = pd.read_csv(ruta_csv) 
     carpeta = Path(carpeta_salida)
     carpeta.mkdir(exist_ok=True)
 
-    
-    columnas_numericas = df.select_dtypes(include=["int64", "float64"]).columns
 
-   
+    columnas_numericas = df.select_dtypes(include=["int64", "float64"]).columns
     if columna_objetivo in columnas_numericas:
         columnas_numericas = columnas_numericas.drop(columna_objetivo)
 
@@ -60,19 +51,13 @@ def analizar_y_normalizar_datos(
         index=False
     )
 
-
-
     df_normalizado = df.copy()
 
     for columna in columnas_numericas:
         minimo = df[columna].min()
         maximo = df[columna].max()
 
-        df_normalizado[columna] = (
-            df[columna] - minimo
-        ) / (
-            maximo - minimo
-        )
+        df_normalizado[columna] = (df[columna] - minimo) / (maximo - minimo)
 
     ruta_csv_normalizado = carpeta / "water_potability_normalizado.csv"
     df_normalizado.to_csv(ruta_csv_normalizado, index=False)
@@ -130,6 +115,4 @@ def analizar_y_normalizar_datos(
 
 
 
-df_normalizado, resumen_antes_de_normalizar, resumen_despues_de_normalizar = analizar_y_normalizar_datos(
-    "water_potability.csv"
-)
+df_normalizado, resumen_antes_de_normalizar, resumen_despues_de_normalizar = analizar_y_normalizar_datos("water_potability.csv")

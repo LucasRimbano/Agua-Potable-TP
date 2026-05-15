@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 df = pd.read_csv("water_potability.csv")
-
 carpeta_salida = Path("boxplots_agua_potable")
 carpeta_salida.mkdir(exist_ok=True)
 
