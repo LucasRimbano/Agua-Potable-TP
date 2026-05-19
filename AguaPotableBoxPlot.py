@@ -19,6 +19,47 @@ columnas = [
 ]
 
 
+print("\n======================================")
+print("ANÁLISIS DE VALORES FALTANTES NaN")
+print("======================================")
+
+print("Cantidad total de muestras:", len(df))
+
+resumen_nan = []
+
+for columna in columnas:
+    cantidad_nan = df[columna].isna().sum()
+    porcentaje_nan = cantidad_nan / len(df) * 100
+
+    resumen_nan.append({
+        "Columna": columna,
+        "Cantidad NaN": cantidad_nan,
+        "Porcentaje NaN": porcentaje_nan
+    })
+
+    print(f"{columna}: {cantidad_nan} NaN ({porcentaje_nan:.2f}%)")
+
+muestras_sin_nan = len(df.dropna())
+muestras_perdidas = len(df) - muestras_sin_nan
+
+print("\nCantidad de muestras si eliminamos todas las filas con NaN:")
+print(muestras_sin_nan)
+
+print("\nCantidad de muestras que se perderían:")
+print(muestras_perdidas)
+
+
+resumen_nan_df = pd.DataFrame(resumen_nan)
+resumen_nan_df.to_csv(
+    carpeta_salida / "resumen_valores_nan.csv",
+    index=False
+)
+
+print("\nResumen de NaN guardado en:")
+print(carpeta_salida / "resumen_valores_nan.csv")
+
+
+
 for columna in columnas:
     Q1 = df[columna].quantile(0.25)
     Q3 = df[columna].quantile(0.75)

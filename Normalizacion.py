@@ -21,6 +21,7 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
         rango = maximo - minimo
         media = df[columna].mean()
         desvio = df[columna].std()
+        cantidad_nan = df[columna].isna().sum()
 
         resumen_antes_de_normalizar.append({
             "Columna": columna,
@@ -28,21 +29,9 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
             "Maximo": maximo,
             "Rango": rango,
             "Media": media,
-            "Desvio estandar": desvio
+            "Desvio estandar": desvio,
+            "Cantidad NaN": cantidad_nan
         })
-
-       
-        plt.figure(figsize=(8, 5))
-        plt.hist(df[columna].dropna(), bins=30, edgecolor="black")
-
-        plt.title(f"Histograma de {columna} - Datos originales")
-        plt.xlabel(columna)
-        plt.ylabel("Frecuencia")
-
-        
-        nombre_archivo = f"histograma_original_{columna}.png"
-        plt.savefig(carpeta / nombre_archivo, bbox_inches="tight")
-        plt.close()
 
     resumen_antes_de_normalizar_df = pd.DataFrame(resumen_antes_de_normalizar)
 
@@ -51,18 +40,27 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
         index=False
     )
 
-    df_normalizado = df.copy()
+  
+    df_nan_reemplazados_media = df.copy()
 
     for columna in columnas_numericas:
-        minimo = df[columna].min()
-        maximo = df[columna].max()
+        media = df_nan_reemplazados_media[columna].mean()
+        df_nan_reemplazados_media[columna] = df_nan_reemplazados_media[columna].fillna(media)
 
-        df_normalizado[columna] = (df[columna] - minimo) / (maximo - minimo)
+    ruta_csv_nan_reemplazados_media = carpeta / "water_potability_imputado_media.csv"
+    df_nan_reemplazados_media.to_csv(ruta_csv_nan_reemplazados_media, index=False)
+
+    df_normalizado = df_nan_reemplazados_media.copy()
+
+    for columna in columnas_numericas:
+         minimo = df_nan_reemplazados_media[columna].min()
+         maximo = df_nan_reemplazados_media[columna].max()
+         df_normalizado[columna] = (df_nan_reemplazados_media[columna] - minimo) / (maximo - minimo)
 
     ruta_csv_normalizado = carpeta / "water_potability_normalizado.csv"
     df_normalizado.to_csv(ruta_csv_normalizado, index=False)
 
-
+    
     resumen_despues_de_normalizar = []
 
     for columna in columnas_numericas:
@@ -71,6 +69,7 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
         rango = maximo - minimo
         media = df_normalizado[columna].mean()
         desvio = df_normalizado[columna].std()
+        cantidad_nan = df_normalizado[columna].isna().sum()
 
         resumen_despues_de_normalizar.append({
             "Columna": columna,
@@ -78,7 +77,8 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
             "Maximo": maximo,
             "Rango": rango,
             "Media": media,
-            "Desvio estandar": desvio
+            "Desvio estandar": desvio,
+            "Cantidad NaN": cantidad_nan
         })
 
         
@@ -109,6 +109,7 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
     print("Resumen DESPUÉS de normalizar:")
     print(resumen_despues_de_normalizar_df)
     print()
+    print(f"CSV con NaN reemplazados por media guardado en: {ruta_csv_nan_reemplazados_media.resolve()}")
     print(f"CSV normalizado guardado en: {ruta_csv_normalizado.resolve()}")
 
     return df_normalizado, resumen_antes_de_normalizar_df, resumen_despues_de_normalizar_df
