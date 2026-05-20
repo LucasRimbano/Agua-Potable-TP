@@ -89,7 +89,53 @@ accuracy_media = entrenar_y_evaluar(
     estrategia_nan="mean"
 )
 
+df_sin_atipicos_csv = pd.read_csv("boxplots_agua_potable/water_potability_sin_atipicos.csv")
 
+print()
+print("NaN en CSV sin valores atípicos:")
+print(df_sin_atipicos_csv.isna().sum())
+
+X_sin_atipicos_csv = df_sin_atipicos_csv.drop("Potability", axis=1)
+y_sin_atipicos_csv = df_sin_atipicos_csv["Potability"]
+
+accuracy_sin_atipicos_media = entrenar_y_evaluar(
+    X_sin_atipicos_csv,
+    y_sin_atipicos_csv,
+    "Modelo con CSV sin valores atípicos",
+    estrategia_nan="mean"
+)
+
+df_sin_atipicos_sin_nan_csv = pd.read_csv(
+    "boxplots_agua_potable/water_potability_sin_atipicos_sin_nan.csv"
+)
+
+print()
+print("NaN en CSV sin valores atípicos y sin NaN:")
+print(df_sin_atipicos_sin_nan_csv.isna().sum())
+
+X_sin_atipicos_sin_nan = df_sin_atipicos_sin_nan_csv.drop("Potability", axis=1)
+y_sin_atipicos_sin_nan = df_sin_atipicos_sin_nan_csv["Potability"]
+
+accuracy_sin_atipicos_sin_nan = entrenar_y_evaluar(
+    X_sin_atipicos_sin_nan,
+    y_sin_atipicos_sin_nan,
+    "Modelo eliminando valores atípicos y filas con NaN",
+    estrategia_nan=None
+)
+
+df_reemplazar_nan_por_media_y_sin_atipicos_csv = pd.read_csv(
+    "boxplots_agua_potable/water_potability_media_luego_sin_atipicos.csv"
+)
+
+X_reemplazar_nan_por_media_y_sin_atipicos = df_reemplazar_nan_por_media_y_sin_atipicos_csv.drop("Potability", axis=1)
+y_reemplazar_nan_por_media_y_sin_atipicos = df_reemplazar_nan_por_media_y_sin_atipicos_csv["Potability"]
+
+accuracy_reemplazar_nan_por_media_y_sin_atipicos = entrenar_y_evaluar(
+    X_reemplazar_nan_por_media_y_sin_atipicos,
+    y_reemplazar_nan_por_media_y_sin_atipicos,
+    "Modelo reemplazando NaN por media y eliminando valores atípicos",
+    estrategia_nan=None
+)
 
 columnas_a_eliminar_1 = ["Turbidity"]
 
@@ -103,7 +149,6 @@ accuracy_sin_turbidity = entrenar_y_evaluar(
 )
 
 
-
 columnas_a_eliminar_2 = ["Turbidity", "ph"]
 
 X_sin_turbidity_ph = X.drop(columnas_a_eliminar_2, axis=1)
@@ -114,8 +159,6 @@ accuracy_sin_turbidity_ph = entrenar_y_evaluar(
     "Modelo usando media y eliminando Turbidity y ph",
     estrategia_nan="mean"
 )
-
-
 
 
 columnas_a_eliminar_3 = ["Turbidity", "ph", "Trihalomethanes"]
@@ -134,6 +177,9 @@ print()
 print("RESUMEN FINAL")
 print("Accuracy eliminando NaN:", accuracy_sin_nan)
 print("Accuracy usando media:", accuracy_media)
+print("Accuracy eliminando filas sin atipicos:", accuracy_sin_atipicos_media)
+print("Accuracy eliminando filas con NaN y sin valores atípicos:", accuracy_sin_atipicos_sin_nan)
+print("Accuracy reemplazando NaN por media y eliminando atípicos:", accuracy_reemplazar_nan_por_media_y_sin_atipicos)
 print("Accuracy eliminando Turbidity:", accuracy_sin_turbidity)
 print("Accuracy eliminando Turbidity y ph:", accuracy_sin_turbidity_ph)
 print("Accuracy eliminando Turbidity, ph y Trihalomethanes:", accuracy_sin_turbidity_ph_trihalo)

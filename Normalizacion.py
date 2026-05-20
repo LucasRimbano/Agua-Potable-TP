@@ -39,28 +39,29 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
         carpeta / "resumen_antes_normalizacion.csv",
         index=False
     )
-
   
-    df_nan_reemplazados_media = df.copy()
+
+    df_sin_nan_sin_atipicos = df.copy()
+   
+    ruta_csv_limpio = carpeta / "water_potability_sin_atipicos_sin_nan.csv"
+    df_sin_nan_sin_atipicos.to_csv(ruta_csv_limpio, index=False)
+
+    df_normalizado = df_sin_nan_sin_atipicos.copy()
 
     for columna in columnas_numericas:
-        media = df_nan_reemplazados_media[columna].mean()
-        df_nan_reemplazados_media[columna] = df_nan_reemplazados_media[columna].fillna(media)
-
-    ruta_csv_nan_reemplazados_media = carpeta / "water_potability_imputado_media.csv"
-    df_nan_reemplazados_media.to_csv(ruta_csv_nan_reemplazados_media, index=False)
-
-    df_normalizado = df_nan_reemplazados_media.copy()
-
-    for columna in columnas_numericas:
-         minimo = df_nan_reemplazados_media[columna].min()
-         maximo = df_nan_reemplazados_media[columna].max()
-         df_normalizado[columna] = (df_nan_reemplazados_media[columna] - minimo) / (maximo - minimo)
-
-    ruta_csv_normalizado = carpeta / "water_potability_normalizado.csv"
-    df_normalizado.to_csv(ruta_csv_normalizado, index=False)
-
+         minimo = df_sin_nan_sin_atipicos[columna].min()
+         maximo = df_sin_nan_sin_atipicos[columna].max()
+         df_normalizado[columna] = (df_sin_nan_sin_atipicos[columna] - minimo) / (maximo - minimo)
+         
     
+
+    ruta_csv_normalizado = carpeta / "water_potability_sin_atipicos_sin_nan_normalizado.csv"
+    
+    df_normalizado.to_csv(
+        ruta_csv_normalizado,
+        index=False
+    )
+
     resumen_despues_de_normalizar = []
 
     for columna in columnas_numericas:
@@ -109,11 +110,11 @@ def analizar_y_normalizar_datos(ruta_csv, carpeta_salida="analisis_normalizacion
     print("Resumen DESPUÉS de normalizar:")
     print(resumen_despues_de_normalizar_df)
     print()
-    print(f"CSV con NaN reemplazados por media guardado en: {ruta_csv_nan_reemplazados_media.resolve()}")
+    print(f"CSV sin NaN y sin atipicos: {ruta_csv_limpio.resolve()}")
     print(f"CSV normalizado guardado en: {ruta_csv_normalizado.resolve()}")
 
     return df_normalizado, resumen_antes_de_normalizar_df, resumen_despues_de_normalizar_df
 
-
-
-df_normalizado, resumen_antes_de_normalizar, resumen_despues_de_normalizar = analizar_y_normalizar_datos("water_potability.csv")
+df_normalizado, resumen_antes_de_normalizar, resumen_despues_de_normalizar = analizar_y_normalizar_datos(
+    "boxplots_agua_potable/water_potability_sin_atipicos_sin_nan.csv"
+)

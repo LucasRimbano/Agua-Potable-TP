@@ -58,7 +58,7 @@ resumen_nan_df.to_csv(
 print("\nResumen de NaN guardado en:")
 print(carpeta_salida / "resumen_valores_nan.csv")
 
-
+df_sin_atipicos = df.copy()
 
 for columna in columnas:
     Q1 = df[columna].quantile(0.25)
@@ -83,7 +83,14 @@ for columna in columnas:
     print("Límite inferior =", limite_inferior)
     print("Límite superior =", limite_superior)
     print("Cantidad de atípicos =", len(atipicos))
-
+    
+    df_sin_atipicos = df_sin_atipicos[
+    (df_sin_atipicos[columna].isna()) |
+    (
+        (df_sin_atipicos[columna] >= limite_inferior) &
+        (df_sin_atipicos[columna] <= limite_superior)
+    )
+    ]
     
     plt.figure(figsize=(6, 5))
     plt.boxplot(df[columna].dropna())
@@ -96,5 +103,57 @@ for columna in columnas:
 
     plt.close()
 
+df_sin_atipicos.to_csv(
+        carpeta_salida / "water_potability_sin_atipicos.csv",
+        index=False
+)
+
+df_sin_atipicos_sin_nan = df_sin_atipicos.dropna()
+
+df_sin_atipicos_sin_nan.to_csv(
+    carpeta_salida / "water_potability_sin_atipicos_sin_nan.csv",
+    index=False
+)
+
+
+df_media_luego_sin_atipicos = df.copy()
+
+
+for columna in columnas:
+    media = df_media_luego_sin_atipicos[columna].mean()
+    df_media_luego_sin_atipicos[columna] = df_media_luego_sin_atipicos[columna].fillna(media)
+
+for columna in columnas:
+    Q1 = df_media_luego_sin_atipicos[columna].quantile(0.25)
+    Q3 = df_media_luego_sin_atipicos[columna].quantile(0.75)
+
+    RIC = Q3 - Q1
+
+    limite_inferior = Q1 - 1.5 * RIC
+    limite_superior = Q3 + 1.5 * RIC
+
+    df_media_luego_sin_atipicos = df_media_luego_sin_atipicos[
+        (df_media_luego_sin_atipicos[columna] >= limite_inferior) &
+        (df_media_luego_sin_atipicos[columna] <= limite_superior)
+    ]
+
+
+df_media_luego_sin_atipicos.to_csv(
+    carpeta_salida / "water_potability_media_luego_sin_atipicos.csv",
+    index=False
+)
+
 print("\nListo. Los boxplots fueron guardados en la carpeta:")
 print(carpeta_salida)
+print("\nCSV sin valores atípicos guardado en:")
+print(carpeta_salida / "water_potability_sin_atipicos.csv")
+print("\nCSV sin valores atípicos y sin NaN guardado en:")
+print(carpeta_salida / "water_potability_sin_atipicos_sin_nan.csv")
+print("\nCantidad de muestras originales:", len(df))
+print("Cantidad de muestras sin atípicos:", len(df_sin_atipicos))
+print("Cantidad de muestras sin atípicos y sin NaN:", len(df_sin_atipicos_sin_nan))
+print("Cantidad de muestras eliminadas al sacar atipicos:", len(df) - len(df_sin_atipicos))
+print("Cantidad de muestras eliminadas sin atípicos y sin NaN:", len(df) - len(df_sin_atipicos_sin_nan))
+print("\nCSV reemplazando NaN por media y luego eliminando atípicos guardado en:")
+print(carpeta_salida / "water_potability_media_luego_sin_atipicos.csv")
+print("Cantidad de muestras reemplazando NaN por media y luego eliminando atípicos:", len(df_media_luego_sin_atipicos))
