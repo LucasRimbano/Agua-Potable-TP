@@ -6,7 +6,7 @@ from pathlib import Path
 
 df = pd.read_csv("water_potability.csv")
 
-carpeta_salida = Path("AGUA_POTABLE_TP_correlacion_pearson")
+carpeta_salida = Path("correlacion_pearson")
 carpeta_salida.mkdir(exist_ok=True)
 
 
@@ -28,7 +28,7 @@ matriz_correlacion.to_csv(
     carpeta_salida / "matriz_correlacion_pearson.csv"
 )
 
-# Crear heatmap de correlación
+
 plt.figure(figsize=(12, 8))
 
 sns.heatmap(
