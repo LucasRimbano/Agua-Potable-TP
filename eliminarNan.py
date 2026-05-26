@@ -46,7 +46,7 @@ def entrenar_y_evaluar(X, y, nombre_experimento, estrategia_nan=None):
         "modelo",
         MLPClassifier(
             solver="sgd",
-            hidden_layer_sizes=(9, 9),
+            hidden_layer_sizes=(9, ),
             activation="relu",
             max_iter=100000,
             learning_rate_init=0.05,

@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 df = pd.read_csv("analisis_normalizacion/water_potability_sin_atipicos_sin_nan_normalizado.csv")
 
@@ -108,30 +110,23 @@ W1, b1, W2, b2 = inicializar_pesos(
 
 def forward(X, W1, b1, W2, b2):
     
-    z1 = np.dot(X, W1) + b1
+    z1 = np.dot(X, W1) + b1 
     a1 = relu(z1)
 
    
     z2 = np.dot(a1, W2) + b2
     a2 = sigmoid(z2)
 
-    print("Tamaño de z1:", z1.shape)
-    print("Tamaño de a1:", a1.shape)
-    print("Tamaño de z2:", z2.shape)
-    print("Tamaño de a2:", a2.shape)
+    
 
     return z1, a1, z2, a2
 
 z1, a1, z2, a2 = forward(X_train, W1, b1, W2, b2)
 
-
-
 def calcular_costo(a2, y):
     error = a2 - y 
     costo = np.mean(error ** 2)
 
-    print("Tamaño del error:", error.shape)
-    print("Costo:", costo)
 
     return costo
 
@@ -163,10 +158,7 @@ def backpropagation(X, y, z1, a1, z2, a2, W2):
     dW1 = np.dot(X.T, dz1)
     db1 = np.sum(dz1, axis=0, keepdims=True)
 
-    print("Tamaño de dW1:", dW1.shape)
-    print("Tamaño de db1:", db1.shape)
-    print("Tamaño de dW2:", dW2.shape)
-    print("Tamaño de db2:", db2.shape)
+    
 
     return dW1, db1, dW2, db2
 
@@ -181,13 +173,19 @@ dW1, db1, dW2, db2 = backpropagation(
 )
 
 
-def entrenar_red(X_train, y_train, W1, b1, W2, b2, epochs=50000, learning_rate=0.01):
+def entrenar_red(X_train, y_train,X_test, y_test, W1, b1, W2, b2, epochs=50000, learning_rate=0.01):
 
     cantidad_datos = X_train.shape[0]
+    
+    historial_epochs = []
+    historial_costo_entrenamiento = []
+    historial_costo_test = []
+    historial_accuracy_entrenamiento = []
+    historial_accuracy_test = []
+
+    epochs_a_guardar = np.linspace(0, epochs - 1, 100, dtype=int)
 
     for epoch in range(epochs):
-
-        
         indice = np.random.randint(0, cantidad_datos)
 
         x = X_train[indice].reshape(1, -1)
@@ -195,15 +193,8 @@ def entrenar_red(X_train, y_train, W1, b1, W2, b2, epochs=50000, learning_rate=0
 
        
         z1, a1, z2, a2 = forward(x, W1, b1, W2, b2)
-
         
         dW1, db1, dW2, db2 = backpropagation(x, y, z1, a1, z2, a2, W2)
-
-      
-        W1_viejo = W1.copy()
-        b1_viejo = b1.copy()
-        W2_viejo = W2.copy()
-        b2_viejo = b2.copy()
 
       
         W1 = W1 - learning_rate * dW1   
@@ -213,30 +204,121 @@ def entrenar_red(X_train, y_train, W1, b1, W2, b2, epochs=50000, learning_rate=0
         b2 = b2 - learning_rate * db2
 
        
-        if epoch % 500 == 0:
+        if epoch in epochs_a_guardar:
             _, _, _, a2_train = forward(X_train, W1, b1, W2, b2)
-            costo = calcular_costo(a2_train, y_train)
+            _, _, _, a2_test = forward(X_test, W1, b1, W2, b2)
+            costo_entrenamiento = calcular_costo(a2_train, y_train)
+            costo_test = calcular_costo(a2_test, y_test)
+            
+            accuracy_entrenamiento = calcular_accuracy(a2_train, y_train)
+            accuracy_test = calcular_accuracy(a2_test, y_test)
 
-            print("Epoch:", epoch)
-            print("Costo:", costo)
+            historial_epochs.append(epoch)
+            historial_costo_entrenamiento.append(costo_entrenamiento)
+            historial_costo_test.append(costo_test)
+            historial_accuracy_entrenamiento.append(accuracy_entrenamiento)
+            historial_accuracy_test.append(accuracy_test)
 
-            print("Ejemplo W1 viejo:", W1_viejo[0][0])
-            print("Ejemplo W1 nuevo:", W1[0][0])
+            print(
+                "Epoch:", epoch,
+                "| Costo train:", round(costo_entrenamiento, 4),
+                "| Costo test:", round(costo_test, 4),
+                "| Acc train:", round(accuracy_entrenamiento * 100, 2), "%",
+                "| Acc test:", round(accuracy_test * 100, 2), "%"
+            )
+  
 
-            print("Ejemplo b1 viejo:", b1_viejo[0][0])
-            print("Ejemplo b1 nuevo:", b1[0][0])
+    return W1, b1, W2, b2,historial_epochs, historial_costo_entrenamiento, historial_costo_test, historial_accuracy_entrenamiento, historial_accuracy_test
 
-            print("Ejemplo W2 viejo:", W2_viejo[0][0])
-            print("Ejemplo W2 nuevo:", W2[0][0])
 
-            print("Ejemplo b2 viejo:", b2_viejo[0][0])
-            print("Ejemplo b2 nuevo:", b2[0][0])
 
-            print("-----------------------------------")
-
-    return W1, b1, W2, b2
 
 def calcular_accuracy(a2, y):
+    predicciones = (a2 >= 0.5).astype(int)
+
+    aciertos = np.sum(predicciones == y)
+    total = y.shape[0]
+
+    accuracy = aciertos / total
+
+    return accuracy
+
+
+
+
+W1, b1, W2, b2, historial_epochs, historial_costo_entrenamiento, historial_costo_test, historial_accuracy_entrenamiento, historial_accuracy_test = entrenar_red(
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    W1,
+    b1,
+    W2,
+    b2,
+    epochs=50000,
+    learning_rate=0.01
+)
+
+
+
+def graficar_curvas_un_solo_grafico(
+    historial_epochs,
+    historial_costo_entrenamiento,
+    historial_costo_test,
+    historial_accuracy_entrenamiento,
+    historial_accuracy_test
+):
+
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # Eje izquierdo: pérdida
+    ax1.plot(historial_epochs, historial_costo_entrenamiento, label="Pérdida entrenamiento")
+    ax1.plot(historial_epochs, historial_costo_test, label="Pérdida test")
+    ax1.set_xlabel("Epochs")
+    ax1.set_ylabel("Pérdida")
+    ax1.grid(True)
+
+    # Eje derecho: accuracy
+    ax2 = ax1.twinx()
+    ax2.plot(
+        historial_epochs,
+        np.array(historial_accuracy_entrenamiento) * 100,
+        label="Accuracy entrenamiento",
+        linestyle="--"
+    )
+    ax2.plot(
+        historial_epochs,
+        np.array(historial_accuracy_test) * 100,
+        label="Accuracy test",
+        linestyle="--"
+    )
+    ax2.set_ylabel("Accuracy (%)")
+    ax2.set_ylim(0, 100)
+
+    plt.title("Curvas de pérdida y precisión")
+
+    # Unimos las leyendas de los dos ejes
+    lineas_1, etiquetas_1 = ax1.get_legend_handles_labels()
+    lineas_2, etiquetas_2 = ax2.get_legend_handles_labels()
+
+    ax1.legend(
+        lineas_1 + lineas_2,
+        etiquetas_1 + etiquetas_2,
+        loc="best"
+    )
+
+    plt.savefig("curvas_entrenamiento_test.png", dpi=300, bbox_inches="tight")
+    plt.show()
+
+graficar_curvas_un_solo_grafico(
+    historial_epochs,
+    historial_costo_entrenamiento,
+    historial_costo_test,
+    historial_accuracy_entrenamiento,
+    historial_accuracy_test
+)
+
+def mostrar_accuracy_final(a2, y):
     predicciones = (a2 >= 0.5).astype(int)
 
     aciertos = np.sum(predicciones == y)
@@ -251,6 +333,13 @@ def calcular_accuracy(a2, y):
 
     return accuracy
 
+print("\n======================================")
+print("EVALUACIÓN FINAL CON DATOS DE ENTRENAMIENTO")
+print("======================================")
+
+_, _, _, a2_train = forward(X_train, W1, b1, W2, b2)
+
+accuracy_train = mostrar_accuracy_final(a2_train, y_train)
 
 print("\n======================================")
 print("EVALUACIÓN CON DATOS DE PRUEBA")
@@ -258,4 +347,4 @@ print("======================================")
 
 _, _, _, a2_test = forward(X_test, W1, b1, W2, b2)
 
-accuracy_test = calcular_accuracy(a2_test, y_test)
+accuracy_test = mostrar_accuracy_final(a2_test, y_test)

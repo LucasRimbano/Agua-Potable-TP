@@ -1,0 +1,7 @@
+Modelo,Arquitectura,Accuracy entrenamiento,Accuracy test
+Red equivalente a NumPy,"(9,)",0.6071428571428571,0.6081330868761553
+Red con 1 capa oculta de 16 neuronas,"(16,)",0.6071428571428571,0.6081330868761553
+Red con 1 capa oculta de 32 neuronas,"(32,)",0.6071428571428571,0.6081330868761553
+Red con 2 capas ocultas de 9 neuronas,"(9, 9)",0.6071428571428571,0.6081330868761553
+Red con 2 capas ocultas de 16 y 8 neuronas,"(16, 8)",0.6071428571428571,0.6081330868761553
+Red con 2 capas ocultas de 32 y 16 neuronas,"(32, 16)",0.6880952380952381,0.6598890942698706
