@@ -27,8 +27,8 @@ Tener las librerias asociadas:
 - Segundo: Ejecutar el archivo correlatividadPearson.py
 - Tercero: Ejecutar el archivo eliminarNan.py 
 - Cuarto: Ejecutar el archivo Normalizacion.py
-- Quinto: Ejecutar el archivo red_neuronal_sklearn.py (Para ver el porcentaje (%) de acierto antes de ver nuestro trabajo)
-- Sexto: Ejecutar el archivo Red_Neuronal.py
+- Quinto: Ejecutar el archivo Red_Neuronal.py (Nuestra Red Neuronal)
+- Sexto: Ejecutar el archivo red_neuronal_sklearn.py (Para ver el porcentaje (%) de acierto antes de ver nuestro trabajo)
 
 ## Objetivo del proyecto
 
