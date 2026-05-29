@@ -173,7 +173,7 @@ dW1, db1, dW2, db2 = backpropagation(
 )
 
 
-def entrenar_red(X_train, y_train,X_test, y_test, W1, b1, W2, b2, epochs=50000, learning_rate=0.01):
+def entrenar_red(X_train, y_train,X_test, y_test, W1, b1, W2, b2, epochs=5000, learning_rate=0.01):
 
     cantidad_datos = X_train.shape[0]
     
@@ -255,65 +255,68 @@ W1, b1, W2, b2, historial_epochs, historial_costo_entrenamiento, historial_costo
     b1,
     W2,
     b2,
-    epochs=50000,
+    epochs=5000,
     learning_rate=0.01
 )
 
-
-
-def graficar_curvas_un_solo_grafico(
+def graficar_perdida(
     historial_epochs,
     historial_costo_entrenamiento,
-    historial_costo_test,
+    historial_costo_test
+):
+    plt.figure(figsize=(12, 6))
+
+    plt.plot(historial_epochs, historial_costo_entrenamiento, label="Pérdida entrenamiento")
+    plt.plot(historial_epochs, historial_costo_test, label="Pérdida test")
+
+    plt.title("Curva de pérdida")
+    plt.xlabel("Epochs")
+    plt.ylabel("Pérdida / Costo")
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig("curva_perdida.png", dpi=300, bbox_inches="tight")
+    plt.show()
+
+
+def graficar_accuracy(
+    historial_epochs,
     historial_accuracy_entrenamiento,
     historial_accuracy_test
 ):
+    plt.figure(figsize=(12, 6))
 
-    fig, ax1 = plt.subplots(figsize=(12, 6))
-
-    # Eje izquierdo: pérdida
-    ax1.plot(historial_epochs, historial_costo_entrenamiento, label="Pérdida entrenamiento")
-    ax1.plot(historial_epochs, historial_costo_test, label="Pérdida test")
-    ax1.set_xlabel("Epochs")
-    ax1.set_ylabel("Pérdida")
-    ax1.grid(True)
-
-    # Eje derecho: accuracy
-    ax2 = ax1.twinx()
-    ax2.plot(
+    plt.plot(
         historial_epochs,
         np.array(historial_accuracy_entrenamiento) * 100,
-        label="Accuracy entrenamiento",
-        linestyle="--"
+        label="Accuracy entrenamiento"
     )
-    ax2.plot(
+
+    plt.plot(
         historial_epochs,
         np.array(historial_accuracy_test) * 100,
-        label="Accuracy test",
-        linestyle="--"
-    )
-    ax2.set_ylabel("Accuracy (%)")
-    ax2.set_ylim(0, 100)
-
-    plt.title("Curvas de pérdida y precisión")
-
-    # Unimos las leyendas de los dos ejes
-    lineas_1, etiquetas_1 = ax1.get_legend_handles_labels()
-    lineas_2, etiquetas_2 = ax2.get_legend_handles_labels()
-
-    ax1.legend(
-        lineas_1 + lineas_2,
-        etiquetas_1 + etiquetas_2,
-        loc="best"
+        label="Accuracy test"
     )
 
-    plt.savefig("curvas_entrenamiento_test.png", dpi=300, bbox_inches="tight")
+    plt.title("Curva de porcentaje de acierto")
+    plt.xlabel("Epochs")
+    plt.ylabel("Accuracy (%)")
+    plt.ylim(35, 63)
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig("curva_accuracy.png", dpi=300, bbox_inches="tight")
     plt.show()
 
-graficar_curvas_un_solo_grafico(
+
+graficar_perdida(
     historial_epochs,
     historial_costo_entrenamiento,
-    historial_costo_test,
+    historial_costo_test
+)
+
+graficar_accuracy(
+    historial_epochs,
     historial_accuracy_entrenamiento,
     historial_accuracy_test
 )
