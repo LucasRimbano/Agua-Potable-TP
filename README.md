@@ -13,8 +13,22 @@ como una red neuronal.
 - Lucas Rimbano
 - Dago Fontanella Tardivo
 
-## Requisitos de ejecucion
+## Requisitos
+Tener instalado:
+- El lenguaje Python, tanto la extensión en Visual Studio Code (o del editro de texto que tenga)
+Tener las librerias asociadas:
+- Scikit-Learn (Herramienta para Redes Neuronales)
+- Pandas (Para extraer archivos CSV)
+- Numpy (Para los cálculos y más eficiencia)
+- Matplotlib (Para leer y ver los gráficos hechos)
 
+## Orden de ejecucion
+- Primero: Ejecutar el archivo de AguaPotableBoxPlot.py
+- Segundo: Ejecutar el archivo correlatividadPearson.py
+- Tercero: Ejecutar el archivo eliminarNan.py 
+- Cuarto: Ejecutar el archivo Normalizacion.py
+- Quinto: Ejecutar el archivo red_neuronal_sklearn.py (Para ver el porcentaje (%) de acierto antes de ver nuestro trabajo)
+- Sexto: Ejecutar el archivo Red_Neuronal.py
 
 ## Objetivo del proyecto
 
